@@ -90,7 +90,7 @@ if params.NICNodeCount > 1:
 # Process nodes, adding to FPGA network
 for i in range(params.FPGANodeCount):
     # Create a node and add it to the request
-    name = "node" + str(i)
+    name = "node" + str(i++)
     node = request.RawPC(name)
     node.disk_image = params.osImage
     # Assign to the node hosting the FPGA.
@@ -104,9 +104,9 @@ for i in range(params.FPGANodeCount):
 pc.printRequestRSpec(request)
 
 # Process nodes, adding to 100G NIC network
-for i in range(params.NICNodeCount):
+for j in range(params.NICNodeCount):
     # Create a node and add it to the request
-    name = "node" + str(i)
+    name = "node" + str(i++)
     node = request.RawPC(name)
     node.disk_image = params.osImage
     # Assign to the node hosting the FPGA.
