@@ -115,7 +115,7 @@ for j in range(params.NICNodeCount):
 
     # Add to lan
     if params.NICNodeCount > 1:
-        iface = node.addInterface("eth1")
+        iface = node.addInterface("enp175s0")
         lan.addInterface(iface)
         pass
     
