@@ -79,8 +79,8 @@ if params.NICNodeCount > 1:
     else:
         lan = request.LAN()
         pass
-    if params.bestEffort:
-        lan.best_effort = True
+    #if params.bestEffort:
+    #    lan.best_effort = True
     #elif params.linkSpeed > 0:
     #    lan.bandwidth = params.linkSpeed
     #if params.sameSwitch:
