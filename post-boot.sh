@@ -10,7 +10,7 @@ install_nic_driver() {
     echo "Untar the NIC package. "
     tar xzvf /tmp/${NIC_PACKAGE}.tgz -C /tmp/
     rm /tmp/${NIC_PACKAGE}.tgz
-    sudo /tmp/${NIC_PACKAGE}/mlnxofedinstall -q --without-fw-update
+    sudo /tmp/${NIC_PACKAGE}/mlnxofedinstall -q #--without-fw-update
 }
 
 install_xrt() {
