@@ -59,8 +59,8 @@ params = pc.bindParameters()
 
 # Check parameter validity.
 
-if params.FPGANodeCount < 1 or params.FPGANodeCount > 4:
-    pc.reportError(portal.ParameterError("The number of FPGA nodes should be greater than 1 and less than 4.", ["FPGANodeCount"]))
+if params.FPGANodeCount > 4:
+    pc.reportError(portal.ParameterError("The number of FPGA nodes should be less than 4.", ["FPGANodeCount"]))
     pass
 if params.NICNodeCount < 1 or params.NICNodeCount > 4:
     pc.reportError(portal.ParameterError("The number of NIC nodes should be greater than 1 and less than 4.", ["NICNodeCount"]))
