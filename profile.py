@@ -86,7 +86,8 @@ if params.NICNodeCount > 1:
     #if params.sameSwitch:
     #    lan.setNoInterSwitchLinks()
     pass
-
+  
+i = 0
 # Process nodes, adding to FPGA network
 for i in range(params.FPGANodeCount):
     # Create a node and add it to the request
@@ -102,8 +103,7 @@ for i in range(params.FPGANodeCount):
         pass 
     pass
 pc.printRequestRSpec(request)
-if not i:
-    i = 0
+
 # Process nodes, adding to 100G NIC network
 for j in range(params.NICNodeCount):
     # Create a node and add it to the request
