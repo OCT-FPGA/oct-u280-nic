@@ -181,7 +181,7 @@ FACTORY_SHELL="xilinx_u280_GOLDEN_8"
 NIC_PACKAGE="MLNX_OFED_LINUX-5.8-1.0.1.1-ubuntu18.04-x86_64"
 
 if [ ! -f ~/boot_flag ]; then
-    install_nic_driver
+    #install_nic_driver
     detect_cards
     install_xrt
     install_shellpkg
