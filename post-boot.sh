@@ -11,6 +11,7 @@ install_nic_driver() {
     tar xzvf /tmp/${NIC_PACKAGE}.tgz -C /tmp/
     rm /tmp/${NIC_PACKAGE}.tgz
     sudo /tmp/${NIC_PACKAGE}/mlnxofedinstall -q #--without-fw-update
+    sudo ifconfig enp175s0np0 up
 }
 
 install_xrt() {
