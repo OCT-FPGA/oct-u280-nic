@@ -116,8 +116,10 @@ for j in range(params.NICNodeCount):
 
     # Add to lan
     if params.NICNodeCount > 1:
-        iface = node.addInterface("enp175s0np0")
-        lan.addInterface(iface)
+        iface1 = node.addInterface("enp175s0np0")
+        lan.addInterface(iface1)
+        iface2 = node.addInterface("enp134s0f0")
+        lan.addInterface(iface2)
         pass
     
     if params.toolVersion != "Do not install tools":
