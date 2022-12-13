@@ -85,6 +85,6 @@ params = pc.bindParameters()
 pc.verifyParameters()
 
 # Process nodes, adding to 100G NIC network
-node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
+host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
 pass
 pc.printRequestRSpec(request)
