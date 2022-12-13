@@ -4,12 +4,6 @@
 # Import the Portal object.
 import geni.portal as portal
 # Import the ProtoGENI library.
-"""An example of constructing a profile that requests the FPGA commbo.
-"""
-
-# Import the Portal object.
-import geni.portal as portal
-# Import the ProtoGENI library.
 import geni.rspec.pg as pg
 # We use the URN library below.
 import geni.urn as urn
@@ -77,7 +71,7 @@ pc.defineParameter("toolVersion", "Tool Version",
                    toolVersion[0], toolVersion,
                    longDescription="Select a tool version. It is recommended to use the latest version for the deployment workflow. For more information, visit https://www.xilinx.com/products/boards-and-kits/alveo/u280.html#gettingStarted")   
 
-pc.printRequestRSpec(request)
+
                    
 # Retrieve the values the user specifies during instantiation.
 params = pc.bindParameters()        
