@@ -65,7 +65,7 @@ lan.addInterface(fpga_iface1)
 request.skipVlans()
 
 # Print the RSpec to the enclosing page.
-pc.printRequestRSpec(request)
+#pc.printRequestRSpec(request)
 # Process nodes, adding to 100G NIC network
 host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
 
