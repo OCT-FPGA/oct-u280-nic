@@ -1,10 +1,10 @@
-"""FPGA-NIC Experiment Profile
+"""An example of constructing a profile that requests the FPGA commbo.
 """
 
 # Import the Portal object.
 import geni.portal as portal
 # Import the ProtoGENI library.
-"""fpga 
+"""An example of constructing a profile that requests the FPGA commbo.
 """
 
 # Import the Portal object.
@@ -22,20 +22,47 @@ pc = portal.Context()
 # Create a Request object to start building the RSpec.
 request = pc.makeRequestRSpec()
 
-# Variable number of nodes.
-pc.defineParameter("FPGANodeCount", "Number of FPGA Nodes", portal.ParameterType.INTEGER, 1,
-                   longDescription="Enter the number of FPGA nodes. Maximum is 4.")
+# Add a PC to the request.
+host = request.RawPC("host")
+# UMass cluster
+host.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
+# Assign to the node hosting the FPGA.
+host.component_id = "pc154"
+# Use the default image for the type of the node selected. 
+host.setUseTypeDefaultImage()
 
-pc.defineParameter("NICNodeCount", "Number of 100G NIC Nodes", portal.ParameterType.INTEGER, 1,
-                   longDescription="Enter the number of 100G NIC nodes. Maximum is 4.")
+# Since we want to create network links to the FPGA, it has its own identity.
+fpga = request.RawPC("fpga")
+# UMass cluster
+fpga.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
+# Assign to the fgpa node
+fpga.component_id = "fpga-pc154"
+# Use the default image for the type of the node selected. 
+fpga.setUseTypeDefaultImage()
 
-# Pick your image.
-imageList = [
-    #('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU20-64-STD', 'UBUNTU 20.04'),    
-    ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD', 'UBUNTU 18.04'), 
-    ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU16-64-STD', 'UBUNTU 16.04'),
-    #('urn:publicid:IDN+emulab.net+image+emulab-ops//CENTOS8-64-STD', 'CENTOS 8.4'),
-    ('urn:publicid:IDN+emulab.net+image+emulab-ops//CENTOS7-64-STD', 'CENTOS 7.9')] 
+# Secret sauce.
+fpga.SubNodeOf(host)
+
+#
+# Create lan of all three interfaces.
+#
+host_iface1 = host.addInterface()
+host_iface1.component_id = "enp134s0f0"
+host_iface1.addAddress(pg.IPv4Address("192.168.40.3", "255.255.255.0"))
+fpga_iface1 = fpga.addInterface()
+fpga_iface1.component_id = "enp175s0f0"
+fpga_iface1.addAddress(pg.IPv4Address("192.168.40.1", "255.255.255.0"))
+fpga_iface2 = fpga.addInterface()
+fpga_iface2.component_id = "enp175s0f1"
+fpga_iface2.addAddress(pg.IPv4Address("192.168.40.2", "255.255.255.0"))
+
+lan = request.LAN()
+lan.addInterface(host_iface1)
+lan.addInterface(fpga_iface1)
+lan.addInterface(fpga_iface2)
+
+# Debugging
+request.skipVlans()
 
 toolVersion = [#('2022.1'),
                ('2021.1'), 
@@ -49,81 +76,15 @@ pc.defineParameter("toolVersion", "Tool Version",
                    portal.ParameterType.STRING,
                    toolVersion[0], toolVersion,
                    longDescription="Select a tool version. It is recommended to use the latest version for the deployment workflow. For more information, visit https://www.xilinx.com/products/boards-and-kits/alveo/u280.html#gettingStarted")   
-pc.defineParameter("osImage", "Select Image",
-                   portal.ParameterType.IMAGE,
-                   imageList[0], imageList,
-                   longDescription="Supported operating systems are Ubuntu and CentOS.")                    
+
+pc.printRequestRSpec(request)
                    
 # Retrieve the values the user specifies during instantiation.
 params = pc.bindParameters()        
-
-# Check parameter validity.
-
-if params.FPGANodeCount > 4:
-    pc.reportError(portal.ParameterError("The number of FPGA nodes should be less than 4.", ["FPGANodeCount"]))
-    pass
-if params.NICNodeCount < 1 or params.NICNodeCount > 4:
-    pc.reportError(portal.ParameterError("The number of NIC nodes should be greater than 1 and less than 4.", ["NICNodeCount"]))
-    pass  
-if params.osImage == "urn:publicid:IDN+emulab.net+image+emulab-ops//CENTOS8-64-STD" and params.toolVersion == "2020.1":
-    pc.reportError(portal.ParameterError("OS and tool version mismatch.", ["osImage"]))
-    pass
-  
+ 
 pc.verifyParameters()
 
-# lan = request.LAN()
-# Create link/lan.
-if params.NICNodeCount > 1:
-    if params.NICNodeCount == 2:
-        lan = request.Link()
-    else:
-        lan = request.LAN()
-        pass
-    #if params.bestEffort:
-    #    lan.best_effort = True
-    #elif params.linkSpeed > 0:
-    #    lan.bandwidth = params.linkSpeed
-    #if params.sameSwitch:
-    #    lan.setNoInterSwitchLinks()
-    pass
-  
-i = 0
-# Process nodes, adding to FPGA network
-for i in range(params.FPGANodeCount):
-    # Create a node and add it to the request
-    name = "node" + str(i)
-    node = request.RawPC(name)
-    node.disk_image = params.osImage
-    # Assign to the node hosting the FPGA.
-    node.hardware_type = "fpga-alveo"
-    node.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
-    
-    if params.toolVersion != "Do not install tools":
-        node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
-        pass 
-    pass
-pc.printRequestRSpec(request)
-
 # Process nodes, adding to 100G NIC network
-for j in range(params.NICNodeCount):
-    # Create a node and add it to the request
-    name = "node" + str(i+j+1)
-    node = request.RawPC(name)
-    node.disk_image = params.osImage
-    # Assign to the node hosting the FPGA.
-    node.hardware_type = "fpga-alveo-100g"
-    node.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
-
-    # Add to lan
-    if params.NICNodeCount > 1:
-        iface1 = node.addInterface("enp175s0np0")
-        lan.addInterface(iface1)
-        iface2 = node.addInterface("enp134s0f0")
-        lan.addInterface(iface2)
-        pass
-    
-    if params.toolVersion != "Do not install tools":
-        node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
-        pass 
-    pass
+node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
+pass
 pc.printRequestRSpec(request)
