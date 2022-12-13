@@ -4,6 +4,12 @@
 # Import the Portal object.
 import geni.portal as portal
 # Import the ProtoGENI library.
+"""An example of constructing a profile that requests the FPGA commbo.
+"""
+
+# Import the Portal object.
+import geni.portal as portal
+# Import the ProtoGENI library.
 import geni.rspec.pg as pg
 # We use the URN library below.
 import geni.urn as urn
@@ -21,7 +27,7 @@ host = request.RawPC("host")
 # UMass cluster
 host.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 # Assign to the node hosting the FPGA.
-host.component_id = "pc154"
+host.component_id = "pc151"
 # Use the default image for the type of the node selected. 
 host.setUseTypeDefaultImage()
 
@@ -30,7 +36,7 @@ fpga = request.RawPC("fpga")
 # UMass cluster
 fpga.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 # Assign to the fgpa node
-fpga.component_id = "fpga-pc154"
+fpga.component_id = "fpga-pc151"
 # Use the default image for the type of the node selected. 
 fpga.setUseTypeDefaultImage()
 
@@ -41,14 +47,14 @@ fpga.SubNodeOf(host)
 # Create lan of all three interfaces.
 #
 host_iface1 = host.addInterface()
-host_iface1.component_id = "enp134s0f0"
-host_iface1.addAddress(pg.IPv4Address("192.168.40.3", "255.255.255.0"))
+host_iface1.component_id = "eth2"
+host_iface1.addAddress(pg.IPv4Address("192.168.40.2", "255.255.255.0"))
 fpga_iface1 = fpga.addInterface()
-fpga_iface1.component_id = "enp175s0f0"
+fpga_iface1.component_id = "eth0"
 fpga_iface1.addAddress(pg.IPv4Address("192.168.40.1", "255.255.255.0"))
 #fpga_iface2 = fpga.addInterface()
-#fpga_iface2.component_id = "enp175s0f1"
-#fpga_iface2.addAddress(pg.IPv4Address("192.168.40.2", "255.255.255.0"))
+#fpga_iface2.component_id = "eth1"
+#fpga_iface2.addAddress(pg.IPv4Address("192.168.40.3", "255.255.255.0"))
 
 lan = request.LAN()
 lan.addInterface(host_iface1)
@@ -58,6 +64,8 @@ lan.addInterface(fpga_iface1)
 # Debugging
 request.skipVlans()
 
+# Print the RSpec to the enclosing page.
+pc.printRequestRSpec(request)
 # Process nodes, adding to 100G NIC network
 host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
 pass
