@@ -21,7 +21,7 @@ host = request.RawPC("host")
 # UMass cluster
 host.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 # Assign to the node hosting the FPGA.
-host.component_id = "pc155"
+host.component_id = "pc154"
 # Use the default image for the type of the node selected. 
 host.setUseTypeDefaultImage()
 
@@ -30,7 +30,7 @@ fpga = request.RawPC("fpga")
 # UMass cluster
 fpga.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 # Assign to the fgpa node
-fpga.component_id = "fpga-pc155"
+fpga.component_id = "fpga-pc154"
 # Use the default image for the type of the node selected. 
 fpga.setUseTypeDefaultImage()
 
@@ -58,27 +58,7 @@ lan.addInterface(fpga_iface1)
 # Debugging
 request.skipVlans()
 
-toolVersion = [#('2022.1'),
-               ('2021.1'), 
-               ('2020.2.1'), 
-               ('2020.2'), 
-               ('2020.1.1'),
-               ('2020.1'),
-               ('Do not install tools')]      
-                   
-pc.defineParameter("toolVersion", "Tool Version",
-                   portal.ParameterType.STRING,
-                   toolVersion[0], toolVersion,
-                   longDescription="Select a tool version. It is recommended to use the latest version for the deployment workflow. For more information, visit https://www.xilinx.com/products/boards-and-kits/alveo/u280.html#gettingStarted")   
-
-
-                   
-# Retrieve the values the user specifies during instantiation.
-params = pc.bindParameters()        
- 
-pc.verifyParameters()
-
 # Process nodes, adding to 100G NIC network
-host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
+host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
 pass
 pc.printRequestRSpec(request)
