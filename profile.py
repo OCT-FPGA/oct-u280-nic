@@ -50,7 +50,7 @@ host_iface1 = host.addInterface()
 host_iface1.component_id = "eth2"
 host_iface1.addAddress(pg.IPv4Address("192.168.40.3", "255.255.255.0"))
 host_iface2 = host.addInterface()
-host_iface2.component_id = "enp175s0np0"
+host_iface2.component_id = "enp175s0f0"
 host_iface2.addAddress(pg.IPv4Address("192.168.40.5", "255.255.255.0"))
 fpga_iface1 = fpga.addInterface()
 fpga_iface1.component_id = "eth0"
