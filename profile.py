@@ -66,7 +66,7 @@ lan.addInterface(fpga_iface1)
 #lan.addInterface(fpga_iface2)
 
 # Debugging
-request.skipVlans()
+# request.skipVlans()
 
 # Print the RSpec to the enclosing page.
 
