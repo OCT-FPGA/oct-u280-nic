@@ -63,7 +63,7 @@ host_iface2.addAddress(pg.IPv4Address("192.168.40.6", "255.255.255.0"))
 lan = request.LAN()
 #lan.addInterface(host_iface1)
 lan.addInterface(host_iface2)
-lan.addInterface(fpga_iface1)
+#lan.addInterface(fpga_iface1)
 #lan.addInterface(fpga_iface2)
 
 # Debugging
