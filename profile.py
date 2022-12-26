@@ -71,6 +71,6 @@ request.skipVlans()
 
 # Print the RSpec to the enclosing page.
 
-#host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
+host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
 
 pc.printRequestRSpec(request)
