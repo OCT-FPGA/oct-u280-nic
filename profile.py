@@ -27,7 +27,8 @@ host = request.RawPC("host")
 # UMass cluster
 host.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 # Assign to the node hosting the FPGA.
-host.component_id = "pc162"
+#host.component_id = "pc162"
+host.hardware_type = "fpga-alveo-100g"
 # Use the default image for the type of the node selected. 
 host.setUseTypeDefaultImage()
 
