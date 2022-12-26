@@ -33,9 +33,9 @@ host.hardware_type = "fpga-alveo-100g"
 host.setUseTypeDefaultImage()
 
 # Since we want to create network links to the FPGA, it has its own identity.
-fpga = request.RawPC("fpga")
+#fpga = request.RawPC("fpga")
 # UMass cluster
-fpga.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
+#fpga.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 # Assign to the fgpa node
 #fpga.component_id = "fpga-pc162"
 # Use the default image for the type of the node selected. 
@@ -53,9 +53,9 @@ fpga.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
 host_iface2 = host.addInterface()
 host_iface2.component_id = "eth3"
 host_iface2.addAddress(pg.IPv4Address("192.168.40.6", "255.255.255.0"))
-fpga_iface1 = fpga.addInterface()
-fpga_iface1.component_id = "eth0"
-fpga_iface1.addAddress(pg.IPv4Address("192.168.40.1", "255.255.255.0"))
+#fpga_iface1 = fpga.addInterface()
+#fpga_iface1.component_id = "eth0"
+#fpga_iface1.addAddress(pg.IPv4Address("192.168.40.1", "255.255.255.0"))
 #fpga_iface2 = fpga.addInterface()
 #fpga_iface2.component_id = "eth1"
 #fpga_iface2.addAddress(pg.IPv4Address("192.168.40.3", "255.255.255.0"))
