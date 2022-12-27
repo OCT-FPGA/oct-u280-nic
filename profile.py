@@ -1,10 +1,10 @@
-"""An example of constructing a profile that requests the FPGA commbo.
+"""A profile that requests a 100G NIC and a U280 FPGA.
 """
 
 # Import the Portal object.
 import geni.portal as portal
 # Import the ProtoGENI library.
-"""An example of constructing a profile that requests the FPGA commbo.
+"""A profile that requests a 100G NIC and a U280 FPGA.
 """
 
 # Import the Portal object.
