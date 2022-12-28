@@ -35,7 +35,7 @@ lan = request.LAN()
 
 # Add a PC to the request.
 for i in range(params.nodeCount):
-  host = request.RawPC("host")
+  host = request.RawPC("host" + str(i))
   # UMass cluster
   host.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
   # Assign to the node hosting the FPGA.
