@@ -83,5 +83,5 @@ for i in range(params.nodeCount):
   host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
 
   # Debugging
-#request.skipVlans()
+request.skipVlans()
 pc.printRequestRSpec(request)
