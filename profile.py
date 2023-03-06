@@ -75,6 +75,17 @@ for i in range(params.nodeCount):
   lan.addInterface(host_iface)
 
   # Print the RSpec to the enclosing page.
+  
+  # Optional Blockstore
+  if params.tempFileSystemSize > 0 or params.tempFileSystemMax:
+    bs = node.Blockstore(name + "-bs", params.tempFileSystemMount)
+    if params.tempFileSystemMax:
+      bs.size = "0GB"
+      else:
+        bs.size = str(params.tempFileSystemSize) + "GB"
+        pass
+      bs.placement = "any"
+      pass
 
   host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
 
