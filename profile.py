@@ -25,6 +25,27 @@ request = pc.makeRequestRSpec()
 pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER, 1,
                    longDescription="Enter the number of FPGA/NIC nodes. Maximum is 4.")
 
+# Optional ephemeral blockstore
+pc.defineParameter("tempFileSystemSize", "Temporary Filesystem Size",
+                   portal.ParameterType.INTEGER, 0,advanced=True,
+                   longDescription="The size in GB of a temporary file system to mount on each of your " +
+                   "nodes. Temporary means that they are deleted when your experiment is terminated. " +
+                   "The images provided by the system have small root partitions, so use this option " +
+                   "if you expect you will need more space to build your software packages or store " +
+                   "temporary files.")
+# Instead of a size, ask for all available space. 
+pc.defineParameter("tempFileSystemMax",  "Temp Filesystem Max Space",
+                    portal.ParameterType.BOOLEAN, False,
+                    advanced=True,
+                    longDescription="Instead of specifying a size for your temporary filesystem, " +
+                    "check this box to allocate all available disk space. Leave the size above as zero.")
+
+pc.defineParameter("tempFileSystemMount", "Temporary Filesystem Mount Point",
+                   portal.ParameterType.STRING,"/mydata",advanced=True,
+                   longDescription="Mount the temporary file system at this mount point; in general you " +
+                   "you do not need to change this, but we provide the option just in case your software " +
+                   "is finicky.")  
+
 params = pc.bindParameters() 
 
 if params.nodeCount < 1 or params.nodeCount > 4:
