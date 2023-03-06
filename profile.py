@@ -78,7 +78,7 @@ for i in range(params.nodeCount):
   
   # Optional Blockstore
   if params.tempFileSystemSize > 0 or params.tempFileSystemMax:
-    bs = node.Blockstore(name + "-bs", params.tempFileSystemMount)
+    bs = host.Blockstore(name + "-bs", params.tempFileSystemMount)
     if params.tempFileSystemMax:
       bs.size = "0GB"
     else:
