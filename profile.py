@@ -1,10 +1,4 @@
-"""A profile that requests a 100G NIC and a U280 FPGA.
-"""
-
-# Import the Portal object.
-import geni.portal as portal
-# Import the ProtoGENI library.
-"""A profile that requests a 100G NIC and a U280 FPGA.
+"""Use this profile for experiments that involve sending packets between U280s and 100 GbE NICs.
 """
 
 # Import the Portal object.
