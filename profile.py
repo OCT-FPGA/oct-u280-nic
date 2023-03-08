@@ -25,6 +25,19 @@ request = pc.makeRequestRSpec()
 pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER, 1,
                    longDescription="Enter the number of FPGA/NIC nodes. Maximum is 4.")
 
+toolVersion = [#('2022.1'),
+               ('2021.1'), 
+               ('2020.2.1'), 
+               ('2020.2'), 
+               ('2020.1.1'),
+               ('2020.1'),
+               ('Do not install tools')]      
+                   
+pc.defineParameter("toolVersion", "Tool Version",
+                   portal.ParameterType.STRING,
+                   toolVersion[0], toolVersion,
+                   longDescription="Select a tool version. It is recommended to use the latest version for the deployment workflow. For more information, visit https://www.xilinx.com/products/boards-and-kits/alveo/u280.html#gettingStarted")   
+
 # Optional ephemeral blockstore
 pc.defineParameter("tempFileSystemSize", "Temporary Filesystem Size",
                    portal.ParameterType.INTEGER, 0,advanced=True,
@@ -87,7 +100,7 @@ for i in range(params.nodeCount):
     bs.placement = "any"
     pass
 
-  host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + "2021.1" + " >> /local/repository/output_log.txt"))
+  host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
 
   # Debugging
 request.skipVlans()
