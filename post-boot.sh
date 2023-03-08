@@ -41,7 +41,7 @@ install_xrt() {
         echo "Installing XRT package..."
         sudo yum install -y /tmp/$XRT_PACKAGE
     fi
-    #rm /tmp/$XRT_PACKAGE
+    sudo bash -c "echo 'source /opt/xilinx/xrt/setup.sh' >> /etc/profile"
 }
 
 install_shellpkg() {
