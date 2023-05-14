@@ -93,9 +93,10 @@ for i in range(params.nodeCount):
       pass
     bs.placement = "any"
     pass
-  if params.toolVersion != "Do not install tools":
-    node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
-    pass 
+  #if params.toolVersion != "Do not install tools":
+  node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
+  
+  #pass 
     
   # Debugging
 request.skipVlans()
