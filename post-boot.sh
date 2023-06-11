@@ -4,16 +4,6 @@
 #
 #!/usr/bin/env bash
 
-install_nic_driver() {
-    echo "Download 100G Mellanox NIC driver"
-    wget -cO - "https://content.mellanox.com/ofed/MLNX_OFED-5.8-1.0.1.1/${NIC_PACKAGE}.tgz" > /tmp/${NIC_PACKAGE}.tgz
-    echo "Untar the NIC package. "
-    tar xzvf /tmp/${NIC_PACKAGE}.tgz -C /tmp/
-    rm /tmp/${NIC_PACKAGE}.tgz
-    sudo /tmp/${NIC_PACKAGE}/mlnxofedinstall -q #--without-fw-update
-    sudo ifconfig enp175s0np0 up
-}
-
 install_xrt() {
     echo "Download XRT installation package"
     wget -cO - "https://www.xilinx.com/bin/public/openDownload?filename=$XRT_PACKAGE" > /tmp/$XRT_PACKAGE
@@ -179,10 +169,7 @@ PACKAGE_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | a
 XRT_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $7}' | awk -F= '{print $2}'`
 FACTORY_SHELL="xilinx_u280_GOLDEN_8"
 
-NIC_PACKAGE="MLNX_OFED_LINUX-5.8-1.0.1.1-ubuntu18.04-x86_64"
-
 if [ ! -f ~/boot_flag ]; then
-    #install_nic_driver
     detect_cards
     install_xrt
     install_shellpkg
