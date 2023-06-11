@@ -1,160 +1,96 @@
-install_xrt() {
-    echo "Download XRT installation package"
-    wget -cO - "https://www.xilinx.com/bin/public/openDownload?filename=$XRT_PACKAGE" > /tmp/$XRT_PACKAGE
-    
-    echo "Install XRT"
-    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
-        echo "Ubuntu XRT install"
-        echo "Installing XRT dependencies..."
-        apt update
-        echo "Installing XRT package..."
-        apt install -y /tmp/$XRT_PACKAGE
-    elif [[ "$OSVERSION" == "centos-8" ]]; then
-        echo "CentOS 8 XRT install"
-        echo "Installing XRT dependencies..."
-        yum config-manager --set-enabled powertools
-        yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-        yum config-manager --set-enabled appstream
-        echo "Installing XRT package..."
-        sudo yum install -y /tmp/$XRT_PACKAGE
-    fi
-    sudo bash -c "echo 'source /opt/xilinx/xrt/setup.sh' >> /etc/profile"
-}
+"""Use this profile for experiments that involve sending packets between U280s and 100 GbE NICs.
+"""
 
-install_shellpkg() {
-if [[ "$SHELL" == 1 ]]; then
-    if [[ "$U280" == 0 ]]; then
-        echo "[WARNING] No FPGA Board Detected."
-        exit 1;
-    fi
-     
-    for PF in U280; do
-        if [[ "$(($PF))" != 0 ]]; then
-            echo "You have $(($PF)) $PF card(s). "
-            PLATFORM=`echo "alveo-$PF" | awk '{print tolower($0)}'`
-            install_u280_shell
-        fi
-    done
-fi
-}
+# Import the Portal object.
+import geni.portal as portal
+# Import the ProtoGENI library.
+import geni.rspec.pg as pg
+# We use the URN library below.
+import geni.urn as urn
+# Emulab extension
+import geni.rspec.emulab
 
-check_shellpkg() {
-    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
-        PACKAGE_INSTALL_INFO=`apt list --installed 2>/dev/null | grep "$PACKAGE_NAME" | grep "$PACKAGE_VERSION"`
-    elif [[ "$OSVERSION" == "centos-8" ]]; then
-        PACKAGE_INSTALL_INFO=`yum list installed 2>/dev/null | grep "$PACKAGE_NAME" | grep "$PACKAGE_VERSION"`
-    fi
-}
+# Create a portal context.
+pc = portal.Context()
 
-check_xrt() {
-    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
-        XRT_INSTALL_INFO=`apt list --installed 2>/dev/null | grep "xrt" | grep "$XRT_VERSION"`
-    elif [[ "$OSVERSION" == "centos-8" ]]; then
-        XRT_INSTALL_INFO=`yum list installed 2>/dev/null | grep "xrt" | grep "$XRT_VERSION"`
-    fi
-}
+# Create a Request object to start building the RSpec.
+request = pc.makeRequestRSpec()
 
-check_requested_shell() {
-    SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$DSA"`
-}
+pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER, 1,
+                   longDescription="Enter the number of FPGA/NIC nodes. Maximum is 4.")
 
-check_factory_shell() {
-    SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$FACTORY_SHELL"`
-}
+toolVersion = [('2022.2'),
+               ('Do not install tools')]      
+                   
+pc.defineParameter("toolVersion", "Tool Version",
+                   portal.ParameterType.STRING,
+                   toolVersion[0], toolVersion,
+                   longDescription="Select a tool version.")   
 
-install_u280_shell() {
-    check_shellpkg
-    if [[ $? != 0 ]]; then
-        echo "Download Shell package"
-        wget -cO - "https://www.xilinx.com/bin/public/openDownload?filename=$SHELL_PACKAGE" > /tmp/$SHELL_PACKAGE
-        if [[ $SHELL_PACKAGE == *.tar.gz ]]; then
-            echo "Untar the package. "
-            tar xzvf /tmp/$SHELL_PACKAGE -C /tmp/
-            rm /tmp/$SHELL_PACKAGE
-        fi
-        echo "Install Shell"
-        if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
-            echo "Install Ubuntu shell package"
-            apt-get install -y /tmp/xilinx*
-        elif [[ "$OSVERSION" == "centos-8" ]]; then
-            echo "Install CentOS shell package"
-            yum install -y /tmp/xilinx*
-        fi
-        rm /tmp/xilinx*
-    else
-        echo "The package is already installed. "
-    fi
-}
+# Optional ephemeral blockstore
+pc.defineParameter("tempFileSystemSize", "Temporary Filesystem Size",
+                   portal.ParameterType.INTEGER, 0,advanced=True,
+                   longDescription="The size in GB of a temporary file system to mount on each of your " +
+                   "nodes. Temporary means that they are deleted when your experiment is terminated. " +
+                   "The images provided by the system have small root partitions, so use this option " +
+                   "if you expect you will need more space to build your software packages or store " +
+                   "temporary files.")
+# Instead of a size, ask for all available space. 
+pc.defineParameter("tempFileSystemMax",  "Temp Filesystem Max Space",
+                    portal.ParameterType.BOOLEAN, False,
+                    advanced=True,
+                    longDescription="Instead of specifying a size for your temporary filesystem, " +
+                    "check this box to allocate all available disk space. Leave the size above as zero.")
 
-detect_cards() {
-    lspci > /dev/null
-    if [ $? != 0 ] ; then
-        if [[ "$OSVERSION" == "ubuntu-16.04" ]] || [[ "$OSVERSION" == "ubuntu-18.04" ]] || [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
-            apt-get install -y pciutils
-        elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
-            yum install -y pciutils
-        fi
-    fi
+pc.defineParameter("tempFileSystemMount", "Temporary Filesystem Mount Point",
+                   portal.ParameterType.STRING,"/mydata",advanced=True,
+                   longDescription="Mount the temporary file system at this mount point; in general you " +
+                   "you do not need to change this, but we provide the option just in case your software " +
+                   "is finicky.")  
 
-    for DEVICE_ID in $(lspci  -d 10ee: | grep " Processing accelerators" | grep "Xilinx" | grep ".0 " | cut -d" " -f7); do
-        if [[ "$DEVICE_ID" == "5008" ]] || [[ "$DEVICE_ID" == "d008" ]] || [[ "$DEVICE_ID" == "500c" ]] || [[ "$DEVICE_ID" == "d00c" ]]; then
-            U280=$((U280 + 1))
-        fi
-    done
-}
+params = pc.bindParameters() 
 
-verify_install() {
-    errors=0
-    check_xrt
-    if [ $? == 0 ] ; then
-        echo "XRT installation verified."
-    else
-        echo "XRT installation could not be verified."
-        errors=$((errors+1))
-    fi
-    check_shellpkg
-    if [ $? == 0 ] ; then
-        echo "Shell package installation verified."
-    else
-        echo "Shell package installation could not be verified."
-        errors=$((errors+1))
-    fi
-    return $errors
-}
-SHELL=1
-OSVERSION=`grep '^ID=' /etc/os-release | awk -F= '{print $2}'`
-OSVERSION=`echo $OSVERSION | tr -d '"'`
-VERSION_ID=`grep '^VERSION_ID=' /etc/os-release | awk -F= '{print $2}'`
-VERSION_ID=`echo $VERSION_ID | tr -d '"'`
-OSVERSION="$OSVERSION-$VERSION_ID"
-TOOLVERSION=$1
-SCRIPT_PATH=/local/repository
-COMB="${TOOLVERSION}_${OSVERSION}"
-XRT_PACKAGE=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $1}' | awk -F= '{print $2}'`
-SHELL_PACKAGE=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $2}' | awk -F= '{print $2}'`
-DSA=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $3}' | awk -F= '{print $2}'`
-PACKAGE_NAME=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $5}' | awk -F= '{print $2}'`
-PACKAGE_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $6}' | awk -F= '{print $2}'`
-XRT_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $7}' | awk -F= '{print $2}'`
-FACTORY_SHELL="xilinx_u280_GOLDEN_8"
+if params.nodeCount < 1 or params.nodeCount > 4:
+    pc.reportError(portal.ParameterError("The number of FPGA nodes should be greater than 1 and less than 4.", ["nodeCount"]))
+    pass
+  
+lan = request.LAN()  
 
-detect_cards
-install_xrt
-install_shellpkg
-verify_install
-    
-if [ $? == 0 ] ; then
-    echo "XRT and shell package installation successful."
-else
-    echo "XRT and/or shell package installation failed."
-    exit 1
-fi
-    
-if check_requested_shell ; then
-    echo "FPGA shell verified."
-else
-    echo "FPGA shell could not be verified."
-    exit 1
-fi
-echo "Done running startup script."
-exit 0
+# Add a PC to the request.
+for i in range(params.nodeCount):
+  name = "host" + str(i)
+  host = request.RawPC(name)
+  # UMass cluster
+  host.component_manager_id = "urn:publicid:IDN+cloudlab.umass.edu+authority+cm"
+  # Assign to the node hosting the FPGA.
+  host.hardware_type = "fpga-alveo-100g"
+  # Use the default image for the type of the node selected. 
+  host.setUseTypeDefaultImage()
+
+  #
+  # Create lan of all three interfaces.
+  #
+  host_iface = host.addInterface()
+  host_iface.component_id = "eth3"
+  host_iface.addAddress(pg.IPv4Address("192.168.40." + str(i+10), "255.255.255.0"))
+
+  lan.addInterface(host_iface)
+
+  # Print the RSpec to the enclosing page.
+  
+  # Optional Blockstore
+  if params.tempFileSystemSize > 0 or params.tempFileSystemMax:
+    bs = host.Blockstore(name + "-bs", params.tempFileSystemMount)
+    if params.tempFileSystemMax:
+      bs.size = "0GB"
+    else:
+      bs.size = str(params.tempFileSystemSize) + "GB"
+      pass
+    bs.placement = "any"
+    pass
+  if params.toolVersion != "Do not install tools":
+    host.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
+  pass   
+  # Debugging
+request.skipVlans()
+pc.printRequestRSpec(request)
