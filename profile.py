@@ -1,12 +1,6 @@
 """Use this profile for experiments that involve sending packets between U280s and 100 GbE NICs.
 """
 
-#!/usr/bin/env bash
-#
-# (C) Copyright 2019, Xilinx, Inc.
-#
-#!/usr/bin/env bash
-
 install_xrt() {
     echo "Download XRT installation package"
     wget -cO - "https://www.xilinx.com/bin/public/openDownload?filename=$XRT_PACKAGE" > /tmp/$XRT_PACKAGE
