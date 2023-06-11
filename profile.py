@@ -19,8 +19,7 @@ request = pc.makeRequestRSpec()
 pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER, 1,
                    longDescription="Enter the number of FPGA/NIC nodes. Maximum is 4.")
 
-imageList = [
-    ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU20-64-STD', 'UBUNTU 20.04')] 
+imageList = [('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU20-64-STD', 'UBUNTU 20.04')] 
 
 toolVersion = [('2022.2'),
                ('Do not install tools')]      
