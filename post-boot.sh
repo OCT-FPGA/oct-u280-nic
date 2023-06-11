@@ -52,7 +52,7 @@ fi
 }
 
 check_shellpkg() {
-    if [[ "$OSVERSION" == "ubuntu-16.04" ]] || [[ "$OSVERSION" == "ubuntu-18.04" ]] || [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
         PACKAGE_INSTALL_INFO=`apt list --installed 2>/dev/null | grep "$PACKAGE_NAME" | grep "$PACKAGE_VERSION"`
     elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
         PACKAGE_INSTALL_INFO=`yum list installed 2>/dev/null | grep "$PACKAGE_NAME" | grep "$PACKAGE_VERSION"`
@@ -60,7 +60,7 @@ check_shellpkg() {
 }
 
 check_xrt() {
-    if [[ "$OSVERSION" == "ubuntu-16.04" ]] || [[ "$OSVERSION" == "ubuntu-18.04" ]] || [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
         XRT_INSTALL_INFO=`apt list --installed 2>/dev/null | grep "xrt" | grep "$XRT_VERSION"`
     elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
         XRT_INSTALL_INFO=`yum list installed 2>/dev/null | grep "xrt" | grep "$XRT_VERSION"`
@@ -68,7 +68,7 @@ check_xrt() {
 }
 
 check_requested_shell() {
-    if [[ "$TOOLVERSION" == "2022.1" ]]; then 
+    if [[ "$TOOLVERSION" == "2022.2" ]]; then 
         SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$DSA"`
     else
         SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt flash --scan | grep "$DSA"`
@@ -76,7 +76,7 @@ check_requested_shell() {
 }
 
 check_factory_shell() {
-    if [[ "$TOOLVERSION" == "2022.1" ]]; then   
+    if [[ "$TOOLVERSION" == "2022.2" ]]; then   
         SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$FACTORY_SHELL"`
     else
         SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt flash --scan | grep "$FACTORY_SHELL"`
@@ -169,34 +169,27 @@ PACKAGE_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | a
 XRT_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $7}' | awk -F= '{print $2}'`
 FACTORY_SHELL="xilinx_u280_GOLDEN_8"
 
-if [ ! -f ~/boot_flag ]; then
-    detect_cards
-    install_xrt
-    install_shellpkg
-    verify_install
+detect_cards
+install_xrt
+install_shellpkg
+verify_install
     
-    if [ $? == 0 ] ; then
-        echo "XRT and shell package installation successful."
-        flash_card
-    else
-        echo "XRT and/or shell package installation failed."
-        exit 1
-    fi
-    
-    if check_factory_shell ; then
-        echo "Shell is in factory reset state. Cold reboot required."   
-        $SCRIPT_PATH/cold-boot-init.sh &
-    elif check_requested_shell ; then
-        echo "Shell is already up to date. Cold reboot not required."
-        touch ~/boot_flag
-    else
-        echo "FPGA shell could not be verified."
-        exit 1
-    fi
-    echo "Done running startup script."
-    exit 0
+if [ $? == 0 ] ; then
+    echo "XRT and shell package installation successful."
+    flash_card
 else
-    echo "Rebooted the node."
-    #This is only supposed to update the SC since the shell is already updated.
-    /opt/xilinx/xrt/bin/xbmgmt flash --update --force
+    echo "XRT and/or shell package installation failed."
+    exit 1
 fi
+    
+if check_factory_shell ; then
+    echo "Shell is in factory reset state."
+    exit 1
+elif check_requested_shell ; then
+    echo "Shell is already up to date." 
+else
+    echo "FPGA shell could not be verified."
+    exit 1
+fi
+echo "Done running startup script."
+exit 0
