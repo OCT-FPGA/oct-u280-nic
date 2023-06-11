@@ -1,6 +1,3 @@
-"""Use this profile for experiments that involve sending packets between U280s and 100 GbE NICs.
-"""
-
 install_xrt() {
     echo "Download XRT installation package"
     wget -cO - "https://www.xilinx.com/bin/public/openDownload?filename=$XRT_PACKAGE" > /tmp/$XRT_PACKAGE
