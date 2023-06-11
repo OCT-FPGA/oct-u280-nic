@@ -19,12 +19,7 @@ request = pc.makeRequestRSpec()
 pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER, 1,
                    longDescription="Enter the number of FPGA/NIC nodes. Maximum is 4.")
 
-toolVersion = [#('2022.1'),
-               ('2021.1'), 
-               ('2020.2.1'), 
-               ('2020.2'), 
-               ('2020.1.1'),
-               ('2020.1'),
+toolVersion = [('2022.2'),
                ('Do not install tools')]      
                    
 pc.defineParameter("toolVersion", "Tool Version",
