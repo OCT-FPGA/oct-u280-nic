@@ -101,7 +101,7 @@ install_u280_shell() {
             echo "Install CentOS shell package"
             yum install -y /tmp/xilinx*
         fi
-        rm /tmp/xilinx*
+        #rm /tmp/xilinx*
         #if [[ -f /tmp/$SHELL_PACKAGE ]]; then rm /tmp/$SHELL_PACKAGE; fi
     else
         echo "The package is already installed. "
