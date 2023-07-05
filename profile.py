@@ -19,6 +19,8 @@ request = pc.makeRequestRSpec()
 pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER, 1,
                    longDescription="Enter the number of FPGA/NIC nodes. Maximum is 4.")
 
+imageList = [('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD', 'UBUNTU 18.04')] 
+
 toolVersion = [#('2022.1'),
                ('2021.1'), 
                ('2020.2.1'), 
@@ -31,7 +33,10 @@ pc.defineParameter("toolVersion", "Tool Version",
                    portal.ParameterType.STRING,
                    toolVersion[0], toolVersion,
                    longDescription="Select a tool version.")   
-
+pc.defineParameter("osImage", "Select Image",
+                   portal.ParameterType.IMAGE,
+                   imageList[0], imageList,
+                   longDescription="Supported operating systems are Ubuntu and CentOS.")  
 # Optional ephemeral blockstore
 pc.defineParameter("tempFileSystemSize", "Temporary Filesystem Size",
                    portal.ParameterType.INTEGER, 0,advanced=True,
@@ -70,7 +75,7 @@ for i in range(params.nodeCount):
   # Assign to the node hosting the FPGA.
   host.hardware_type = "fpga-alveo-100g"
   # Use the default image for the type of the node selected. 
-  host.setUseTypeDefaultImage()
+  host.disk_image = params.osImage
 
   #
   # Create lan of all three interfaces.
