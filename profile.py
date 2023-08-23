@@ -1,4 +1,4 @@
-"""Use this profile for experiments that involve sending packets between U280s and 100 GbE NICs.
+"""OCT Alveo U280 + 100 GbE NIC profile with post-boot script
 """
 
 # Import the Portal object.
