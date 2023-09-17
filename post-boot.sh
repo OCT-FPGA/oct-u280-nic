@@ -9,22 +9,15 @@ install_xrt() {
     wget -cO - "https://www.xilinx.com/bin/public/openDownload?filename=$XRT_PACKAGE" > /tmp/$XRT_PACKAGE
     
     echo "Install XRT"
-    if [[ "$OSVERSION" == "ubuntu-16.04" ]] || [[ "$OSVERSION" == "ubuntu-18.04" ]] || [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+    if [[ "$OSVERSION" == "ubuntu-20.04" ]] || [[ "$OSVERSION" == "ubuntu-22.04" ]]; then
         echo "Ubuntu XRT install"
         echo "Installing XRT dependencies..."
         apt update
         echo "Installing XRT package..."
         apt install -y /tmp/$XRT_PACKAGE
-    elif [[ "$OSVERSION" == "centos-7" ]] ; then
-        echo "CentOS 7 XRT install"
-        echo "Installing XRT dependencies..."
-        yum install -y epel-release
-        echo "Installing XRT package..."
-        yum install -y /tmp/$XRT_PACKAGE
     elif [[ "$OSVERSION" == "centos-8" ]]; then
         echo "CentOS 8 XRT install"
         echo "Installing XRT dependencies..."
-        #sudo yum remove -y xrt
         yum config-manager --set-enabled powertools
         yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
         yum config-manager --set-enabled appstream
@@ -32,12 +25,13 @@ install_xrt() {
         sudo yum install -y /tmp/$XRT_PACKAGE
     fi
     sudo bash -c "echo 'source /opt/xilinx/xrt/setup.sh' >> /etc/profile"
+    sudo bash -c "echo 'source /proj/octfpga-PG0/tools/Xilinx/Vitis/2023.1/settings64.sh' >> /etc/profile"
 }
 
 install_shellpkg() {
 if [[ "$SHELL" == 1 ]]; then
     if [[ "$U280" == 0 ]]; then
-        echo "[WARNING] No FPGA Board Detected. Skip shell flash."
+        echo "[WARNING] No FPGA Board Detected."
         exit 1;
     fi
      
@@ -52,35 +46,27 @@ fi
 }
 
 check_shellpkg() {
-    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+    if [[ "$OSVERSION" == "ubuntu-20.04" ]] || [[ "$OSVERSION" == "ubuntu-22.04" ]]; then
         PACKAGE_INSTALL_INFO=`apt list --installed 2>/dev/null | grep "$PACKAGE_NAME" | grep "$PACKAGE_VERSION"`
-    elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
+    elif [[ "$OSVERSION" == "centos-8" ]]; then
         PACKAGE_INSTALL_INFO=`yum list installed 2>/dev/null | grep "$PACKAGE_NAME" | grep "$PACKAGE_VERSION"`
     fi
 }
 
 check_xrt() {
-    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+    if [[ "$OSVERSION" == "ubuntu-20.04" ]] || [[ "$OSVERSION" == "ubuntu-22.04" ]]; then
         XRT_INSTALL_INFO=`apt list --installed 2>/dev/null | grep "xrt" | grep "$XRT_VERSION"`
-    elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
+    elif [[ "$OSVERSION" == "centos-8" ]]; then
         XRT_INSTALL_INFO=`yum list installed 2>/dev/null | grep "xrt" | grep "$XRT_VERSION"`
     fi
 }
 
 check_requested_shell() {
-    if [[ "$TOOLVERSION" == "2022.2" ]]; then 
-        SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$DSA"`
-    else
-        SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt flash --scan | grep "$DSA"`
-    fi
+    SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$DSA"`
 }
 
 check_factory_shell() {
-    if [[ "$TOOLVERSION" == "2022.2" ]]; then   
-        SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$FACTORY_SHELL"`
-    else
-        SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt flash --scan | grep "$FACTORY_SHELL"`
-    fi
+    SHELL_INSTALL_INFO=`/opt/xilinx/xrt/bin/xbmgmt examine | grep "$FACTORY_SHELL"`
 }
 
 install_u280_shell() {
@@ -94,44 +80,41 @@ install_u280_shell() {
             rm /tmp/$SHELL_PACKAGE
         fi
         echo "Install Shell"
-        if [[ "$OSVERSION" == "ubuntu-16.04" ]] || [[ "$OSVERSION" == "ubuntu-18.04" ]] || [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+        if [[ "$OSVERSION" == "ubuntu-20.04" ]] || [[ "$OSVERSION" == "ubuntu-22.04" ]]; then
             echo "Install Ubuntu shell package"
             apt-get install -y /tmp/xilinx*
-        elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
+        elif [[ "$OSVERSION" == "centos-8" ]]; then
             echo "Install CentOS shell package"
             yum install -y /tmp/xilinx*
         fi
-        #rm /tmp/xilinx*
-        #if [[ -f /tmp/$SHELL_PACKAGE ]]; then rm /tmp/$SHELL_PACKAGE; fi
+        rm /tmp/xilinx*
     else
         echo "The package is already installed. "
-    fi
-}
-
-flash_card() {
-    echo "Flash Card(s). "
-    if [[ "$TOOLVERSION" == "2022.1" ]]; then
-        /opt/xilinx/xrt/bin/xbmgmt program --base --device 0000:3b:00.0
-    else
-        /opt/xilinx/xrt/bin/xbmgmt flash --update --shell $DSA --force
     fi
 }
 
 detect_cards() {
     lspci > /dev/null
     if [ $? != 0 ] ; then
-        if [[ "$OSVERSION" == "ubuntu-16.04" ]] || [[ "$OSVERSION" == "ubuntu-18.04" ]] || [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+        if [[ "$OSVERSION" == "ubuntu-20.04" ]] || [[ "$OSVERSION" == "ubuntu-22.04" ]]; then
             apt-get install -y pciutils
         elif [[ "$OSVERSION" == "centos-7" ]] || [[ "$OSVERSION" == "centos-8" ]]; then
             yum install -y pciutils
         fi
     fi
-
-    for DEVICE_ID in $(lspci  -d 10ee: | grep " Processing accelerators" | grep "Xilinx" | grep ".0 " | cut -d" " -f7); do
-        if [[ "$DEVICE_ID" == "5008" ]] || [[ "$DEVICE_ID" == "d008" ]] || [[ "$DEVICE_ID" == "500c" ]] || [[ "$DEVICE_ID" == "d00c" ]]; then
-            U280=$((U280 + 1))
-        fi
-    done
+    if [[ "$OSVERSION" == "ubuntu-20.04" ]]; then
+        for DEVICE_ID in $(lspci  -d 10ee: | grep " Processing accelerators" | grep "Xilinx" | grep ".0 " | cut -d" " -f7); do
+            if [[ "$DEVICE_ID" == "5008" ]] || [[ "$DEVICE_ID" == "d008" ]] || [[ "$DEVICE_ID" == "500c" ]] || [[ "$DEVICE_ID" == "d00c" ]]; then
+                U280=$((U280 + 1))
+            fi
+        done
+    elif [[ "$OSVERSION" == "ubuntu-22.04" ]]; then
+        for DEVICE_ID in $(lspci  -d 10ee: | grep " Processing accelerators" | grep "Xilinx" | grep ".1 " | cut -d" " -f7); do
+            if [[ "$DEVICE_ID" == "5008" ]] || [[ "$DEVICE_ID" == "d008" ]] || [[ "$DEVICE_ID" == "500c" ]] || [[ "$DEVICE_ID" == "d00c" ]] || [[ "$DEVICE_ID" == "500d" ]]; then
+                U280=$((U280 + 1))
+            fi
+        done
+    fi
 }
 
 verify_install() {
@@ -169,6 +152,7 @@ PACKAGE_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | a
 XRT_VERSION=`grep ^$COMB: $SCRIPT_PATH/spec.txt | awk -F':' '{print $2}' | awk -F';' '{print $7}' | awk -F= '{print $2}'`
 FACTORY_SHELL="xilinx_u280_GOLDEN_8"
 
+
 detect_cards
 install_xrt
 install_shellpkg
@@ -176,17 +160,13 @@ verify_install
     
 if [ $? == 0 ] ; then
     echo "XRT and shell package installation successful."
-    flash_card
 else
     echo "XRT and/or shell package installation failed."
     exit 1
 fi
     
-if check_factory_shell ; then
-    echo "Shell is in factory reset state."
-    exit 1
-elif check_requested_shell ; then
-    echo "Shell is already up to date." 
+if check_requested_shell ; then
+    echo "FPGA shell verified."
 else
     echo "FPGA shell could not be verified."
     exit 1
