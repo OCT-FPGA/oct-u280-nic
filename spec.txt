@@ -1,3 +1,12 @@
+## 2022.1
+2022.1_ubuntu-20.04:XRT_PACKAGE=xrt_202210.2.13.479_20.04-amd64-xrt.deb;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2022.1_2022_0804_1110-all.deb.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2022.1-ubuntu-20.04;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.13.479;
+2022.1_centos-8:XRT_PACKAGE=xrt_202210.2.13.479_8.1.1911-x86_64-xrt.rpm;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2022.1_2022_0804_1110-noarch.rpm.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2022.1-centos-8;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.13.479;
+
 ## 2022.2
 2022.2_ubuntu-20.04:XRT_PACKAGE=xrt_202220.2.14.354_20.04-amd64-xrt.deb;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2022.2_2022_1015_0317-all.deb.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2022.2-ubuntu-20.04;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.14.354;
 2022.2_centos-8:XRT_PACKAGE=xrt_202220.2.14.354_8.1.1911-x86_64-xrt.rpm;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2022.2_2022_1015_0317-noarch.rpm.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2022.2-centos-8;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.14.354;
+
+## 2023.1
+2023.1_ubuntu-20.04:XRT_PACKAGE=xrt_202310.2.15.228_20.04-amd64-xrt.deb;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2023.1_2023_0613_1330-all.deb.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2023.1-ubuntu-20.04;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.15.228;
+2023.1_ubuntu-22.04:XRT_PACKAGE=xrt_202310.2.15.228_22.04-amd64-xrt.deb;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2023.1_2023_0613_1330-all.deb.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2023.1-ubuntu-22.04;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.15.228;
+2023.1_centos-8:XRT_PACKAGE=xrt_202310.2.15.228_8.1.1911-x86_64-xrt.rpm;SHELL_PACKAGE=xilinx-u280-gen3x16-xdma_2023.1_2023_0613_1330-noarch.rpm.tar.gz;DSA=xilinx_u280_gen3x16_xdma_base_1;IMAGE_TAG=alveo-2023.1-centos-8;PACKAGE_NAME=xilinx-u280-gen3x16-xdma-base;PACKAGE_VERSION=1-3585717;XRT_VERSION=2.15.228;
