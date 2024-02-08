@@ -120,5 +120,5 @@ for i in range(params.nodeCount):
         node.addService(pg.Execute(shell="bash", command="sudo /local/repository/post-boot.sh " + params.toolVersion + " >> /local/repository/output_log.txt"))
         pass 
     pass
-request.skipVlans()  
+#request.skipVlans()  
 pc.printRequestRSpec(request)
